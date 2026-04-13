@@ -14,17 +14,19 @@ A template for building Rust game plugins for both Oxide and Carbon frameworks.
 
 - [dotnet](https://dotnet.microsoft.com/en-us/download/dotnet) SDK - for building the plugin and running the build scripts
 - Windows - for running the Rust server and scripts
-- NodeJS - (Optional) for merging partial classes outputed by Plugin.Merge (disabled by default, see `Directory.Build.targets` to enable)
+- (Optional) NodeJS - for [merging partial classes](#optional-merging-partial-classes) outputed by Plugin.Merge
 
 ## Getting Started
+
+> Note: The following instructions will get you setup for all environments, but you can choose to omit some environments you're not planning to build for (e.g: don't run any of the staging scripts if you don't plan on building for staging). The template is designed to only build for the available environments!
 
 1. Clone the repository and navigate to the project directory. You can also use Github's template feature to create your own repository based on this template.
 2. Find and Replace the following in the codebase:
    1. `MyCarbonoxide` (CASE SENSITIVE!) - Replace with the the name of your plugin, no spaces (e.g., `GatherManager`). Check for files that have `MyCarbonoxide` in their name as well!
    2. `mycarbonoxide` (CASE SENSITIVE!) - Replace with the lowercase name of your plugin, no spaces (e.g., `gathermanager`). This is used for things like config file names and permission strings.
 3. Run all the `update_*.bat` scripts (not `_update*.bat` files!) to create/update the local game servers. They will be created in the `servers` folder.
-4. In Carbon servers `config.json` (`servers/carbon-*/carbon/config.json`), set `DeveloperMode` to `true` so that developer assemblies will be generated on the first run.
-5. Run all the `run_*.bat` scripts at least once to generate the framework folders and initialize their worlds. (do this every update for Carbon servers, so you get the latest developer assemblies)
+4. Run all the `run_*.bat` scripts at least once to generate the framework folders and initialize their worlds. (do this every update for Carbon servers, so you get the latest developer assemblies)
+5. In Carbon servers `config.json` (`servers/carbon-*/carbon/config.json`), set `DeveloperMode` to `true` so that developer assemblies will be generated on the first run.
 6. If you want to start fresh without the opinionated structure I've included, you can delete all the included files in the `src` folder except for `MyCarbonoxide.cs`. The included files are just a suggestion to demonstrate the multi-file structure and how to use partial classes.
 
 ## Building the Plugin
@@ -66,17 +68,18 @@ This runs the normal build first, then compiles against each environment's assem
 - Use `Tasks: Run Build Task` command to view all the build tasks available, instead of typing out the commands listed above.
 - To switch between Oxide and Carbon project contexts in VS Code (e.g., to see Carbon-specific conditional compilation symbols), use the `CSharp: Change the active document's project context` command while inside a `.cs` file and select the desired environment project.
 
-## (Optional) post-merge script
+## (Optional) Merging partial classes
 
-Plugin.Merge merges all partial classes into one file, but, at the time of writing, it just appends all partial classes one after another, as they are discovered. This leaves your final plugin with partial classes sprinkled around your final plugin file, which can look a bit messy (even if you don't work on the final file directly, curators still need to read through it!).
+Plugin.Merge merges all partial classes into one file.At the time of writing, it just appends all partial classes one after another, as they are discovered. This leaves your final plugin with partial classes sprinkled around your final plugin file, which can look a bit messy (even if you don't work on the final file directly, curators still need to read through it!).
 
 I created a [`post-merge.ts`](scripts/post-merge.ts) script to manually merge the partial classes into a single class declaration. It is written in TypeScript, because I'm much more experienced with it than C# and it was originally written for one of my paid plugins (Contracts), which has 10k+ lines of code and 50+ partial classes declarations.
 
-By default, this script is not used, since I'm not assuming you have NodeJS installed. If you do, you can:
+By default, the build will skip merging partial classes, but if you want to enable it, just follow these steps:
 
-1. Install the dependencies by running `npm install` in the project directory.
-2. Enable the post-merge script in `Directory.Build.targets` by uncommenting the relevant lines.
-3. Run the build scripts as usual, and the final plugin file will have all partial classes merged into a single class declaration, making it cleaner and easier to read for curators and other developers.
+1. Ensure you have NodeJS installed.
+   > I personally use [Volta](https://volta.sh/), because it automatically manages NodeJS versions for all my other TypeScript repos, but you can also install it [globally](https://nodejs.org/) or use something like [nvm](https://github.com/nvm-sh/nvm)
+2. Install the dependencies by running `npm install` in the project directory.
+3. The build process will automatically start using the `post-merge.ts` script in the build process when it detects NodeJS and the presence of the `node_modules` folder.
 
 ## Plugin Dependencies
 
