@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "mjsu.plugin.merge": {
+      "version": "1.0.15",
+      "commands": [
+        "plugin.merge"
+      ],
+      "rollForward": false
+    },
+    "csharpier": {
+      "version": "1.2.5",
+      "commands": [
+        "csharpier"
+      ],
+      "rollForward": false
+    }
+  }
+}

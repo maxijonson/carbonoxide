@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ServerPath>servers/oxide-production</ServerPath>
+    </PropertyGroup>
+
+    <Import Project="oxide.props" />
+
+    <Target Name="CopyPlugin" AfterTargets="PostBuild" Condition="'$(SkipPostBuild)' != 'true'">
+        <ItemGroup>
+            <ServerDirs Include="$([System.IO.Directory]::GetDirectories('servers', '*', System.IO.SearchOption.TopDirectoryOnly))" />
+            <ServerPluginDirs
+                Include="%(ServerDirs.Identity)/oxide/plugins"
+                Condition="Exists('%(ServerDirs.Identity)/oxide/plugins')"
+            />
+            <ServerPluginDirs
+                Include="%(ServerDirs.Identity)/carbon/plugins"
+                Condition="Exists('%(ServerDirs.Identity)/carbon/plugins')"
+            />
+        </ItemGroup>
+        <Copy
+            SourceFiles="MyCarbonoxide.cs"
+            DestinationFolder="%(ServerPluginDirs.Identity)"
+            Condition="'@(ServerPluginDirs)' != ''"
+        />
+    </Target>
+
+    <Target Name="ValidateAll" DependsOnTargets="Build">
+        <MSBuild Projects="oxide-production.csproj" Targets="Restore;Build" Properties="SkipPostBuild=true" />
+        <MSBuild Projects="oxide-staging.csproj" Targets="Restore;Build" Properties="SkipPostBuild=true" />
+        <MSBuild Projects="carbon-production.csproj" Targets="Restore;Build" Properties="SkipPostBuild=true" />
+        <MSBuild Projects="carbon-staging.csproj" Targets="Restore;Build" Properties="SkipPostBuild=true" />
+    </Target>
+</Project>

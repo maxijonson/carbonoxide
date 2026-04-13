@@ -1,0 +1,100 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build All Environments",
+            "detail": "Builds oxide-production and copies the plugin to all servers.",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["build", "plugin.csproj"],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Watch All Environments",
+            "detail": "Watches for changes in plugin.csproj and builds all environments on change.",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["watch", "build", "--project", "plugin.csproj"],
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build: oxide-production",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["build", "oxide-production.csproj"],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build: oxide-staging",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["build", "oxide-staging.csproj"],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build: carbon-production",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["build", "carbon-production.csproj"],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build: carbon-staging",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["build", "carbon-staging.csproj"],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Watch: oxide-production",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["watch", "build", "--project", "oxide-production.csproj"],
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Watch: oxide-staging",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["watch", "build", "--project", "oxide-staging.csproj"],
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Watch: carbon-production",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["watch", "build", "--project", "carbon-production.csproj"],
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Watch: carbon-staging",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["watch", "build", "--project", "carbon-staging.csproj"],
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Validate All Environments",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["msbuild", "plugin.csproj", "-t:ValidateAll"],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ServerPath>servers/carbon-production</ServerPath>
+    </PropertyGroup>
+
+    <Import Project="carbon.props" />
+</Project>

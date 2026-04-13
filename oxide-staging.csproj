@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ServerPath>servers/oxide-staging</ServerPath>
+    </PropertyGroup>
+
+    <Import Project="oxide.props" />
+</Project>

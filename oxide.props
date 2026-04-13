@@ -1,0 +1,36 @@
+<Project>
+    <PropertyGroup>
+        <RustServerManagedPath>$(ServerPath)/RustDedicated_Data/Managed</RustServerManagedPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference
+            Include="$(RustServerManagedPath)/*.dll"
+            Exclude="
+                $(RustServerManagedPath)/Newtonsoft.Json.dll;
+                $(RustServerManagedPath)/System.Net.Http.dll;
+                $(RustServerManagedPath)/Microsoft.Win32.Registry.dll;
+                $(RustServerManagedPath)/System.Threading.Tasks.Extensions.dll;
+                $(RustServerManagedPath)/System.Configuration.Install.dll;
+                $(RustServerManagedPath)/System.IO.Compression.dll;
+                $(RustServerManagedPath)/System.Runtime.dll;
+                $(RustServerManagedPath)/System.IO.FileSystem.AccessControl.dll;
+                $(RustServerManagedPath)/System.Security.Principal.Windows.dll;
+                $(RustServerManagedPath)/System.Security.AccessControl.dll;
+                $(RustServerManagedPath)/Microsoft.Bcl.AsyncInterfaces.dll;
+                $(RustServerManagedPath)/System.Text.Encodings.Web.dll;
+                $(RustServerManagedPath)/System.Security.Cryptography.ProtectedData.dll;
+                $(RustServerManagedPath)/System.Numerics.Vectors.dll;
+            "
+            Private="false"
+        />
+    </ItemGroup>
+
+    <Target Name="CopyPlugin" AfterTargets="PostBuild" Condition="'$(SkipPostBuild)' != 'true'">
+        <Copy
+            SourceFiles="MyCarbonoxide.cs"
+            DestinationFolder="$(ServerPath)/oxide/plugins"
+            Condition="Exists('$(ServerPath)/oxide/plugins')"
+        />
+    </Target>
+</Project>

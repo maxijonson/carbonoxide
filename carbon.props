@@ -1,0 +1,12 @@
+<Project>
+    <!-- Don't forget to set DeveloperMode to true in carbon/config.json -->
+    <Import Project="$(ServerPath)/Carbon.targets" />
+
+    <Target Name="CopyPlugin" AfterTargets="PostBuild" Condition="'$(SkipPostBuild)' != 'true'">
+        <Copy
+            SourceFiles="MyCarbonoxide.cs"
+            DestinationFolder="$(ServerPath)/carbon/plugins"
+            Condition="Exists('$(ServerPath)/carbon/plugins')"
+        />
+    </Target>
+</Project>

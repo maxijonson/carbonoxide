@@ -1,0 +1,15 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <LangVersion>11</LangVersion>
+        <RootNamespace>Oxide.Plugins</RootNamespace>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+        <NoStandardLibraries>true</NoStandardLibraries>
+        <NoStdLib>true</NoStdLib>
+        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+        <NoCompilerStandardLib>true</NoCompilerStandardLib>
+        <MSBuildWarningsAsMessages>MSB3277;MSB3106</MSBuildWarningsAsMessages>
+    </PropertyGroup>
+</Project>

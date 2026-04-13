@@ -1,0 +1,44 @@
+{
+  "Platform": "Oxide",
+  "Merge Settings": {
+    "Plugin Name": "MyCarbonoxide",
+    "Creator Mode": "Plugin",
+    "Namespace Override": "",
+    "Plugin Input Paths": [
+      "./src"
+    ],
+    "Plugin Output Paths": [
+      "./"
+    ],
+    "Reference Definitions": [],
+    "Requires Definitions": [],
+    "Define Definitions": [],
+    "Ignore Paths": [],
+    "Ignore Files": [],
+    "Ignore Namespaces": [
+      "MyCarbonoxidePlugin"
+    ],
+    "Code Style": {
+      "Indent Character": " ",
+      "Indent Char Amount": 4,
+      "Indent Multiplier": 1,
+      "New Line String": "\r\n",
+      "Write The Relative File Path In Region": false,
+      "Keep Code Comments": true
+    }
+  },
+  "Preprocessor Directive Settings": {
+    "Preprocessor Directives": []
+  },
+  "Compile Settings": {
+    "Assembly Paths": [
+      "./servers/oxide-production/RustDedicated_Data/Managed"
+    ],
+    "Ignore Paths": [
+      "./servers/oxide-production/RustDedicated_Data/Managed/x86",
+      "./servers/oxide-production/RustDedicated_Data/Managed/x64"
+    ],
+    "Ignore Files": [],
+    "Compile Log Level (Hidden, Info, Warning, Error)": "Error"
+  }
+}

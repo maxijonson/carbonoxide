@@ -1,0 +1,13 @@
+steam/
+server/
+servers/
+bin
+obj
+node_modules
+
+dependencies/**/*
+!dependencies/.gitkeep
+
+# You can delete the following lines, it's just so it doesn't appear for the template because it is not relevant to it.
+MyCarbonoxide.cs
+!src/**/MyCarbonoxide.cs

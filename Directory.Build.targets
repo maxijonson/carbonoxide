@@ -1,0 +1,29 @@
+<Project>
+    <ItemGroup>
+        <Compile Remove="MyCarbonoxide.cs" />
+        <Compile Remove="servers/*/oxide/plugins/**/*.cs" />
+        <Compile Remove="servers/*/carbon/plugins/**/*.cs" />
+        <Compile Remove="backup/*.cs" />
+        <Compile Remove="dependencies/**/*.cs" />
+    </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SkipPostBuild)' != 'true'">
+        <!-- Merge files in src into a single plugin file that can be installed on game servers -->
+        <Exec Command="dotnet tool run plugin.merge -- -m -c -p merge.json" />
+
+        <!-- Merge partial classes if NodeJS is available (requires `npm install`). If Plugin.Merge eventually supports merging partial classes natively, this can be removed. -->
+        <Exec
+            Command="where npx"
+            IgnoreExitCode="true"
+            StandardOutputImportance="low"
+            StandardErrorImportance="low"
+            Condition="Exists('node_modules')"
+        >
+            <Output TaskParameter="ExitCode" PropertyName="NpxExitCode" />
+        </Exec>
+        <Exec Command="npx tsx scripts/post-merge.ts MyCarbonoxide.cs" Condition="'$(NpxExitCode)' == '0'" />
+
+        <!-- Formats the file for consistent outputs and avoid things like spaces and line breaks to appear as diffs -->
+        <Exec Command="dotnet tool run csharpier -- format ." />
+    </Target>
+</Project>
