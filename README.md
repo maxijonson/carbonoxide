@@ -72,7 +72,7 @@ This runs the normal build first, then compiles against each environment's assem
 
 Plugin.Merge merges all partial classes into one file.At the time of writing, it just appends all partial classes one after another, as they are discovered. This leaves your final plugin with partial classes sprinkled around your final plugin file, which can look a bit messy (even if you don't work on the final file directly, curators still need to read through it!).
 
-I created a [`post-merge.ts`](scripts/post-merge.ts) script to manually merge the partial classes into a single class declaration. It is written in TypeScript, because I'm much more experienced with it than C# and it was originally written for one of my paid plugins (Contracts), which has 10k+ lines of code and 50+ partial classes declarations.
+I created a [`post-merge.ts`](scripts/post-merge.ts) script to automatically merge the partial classes into a single class declaration. It is written in TypeScript, because I'm much more experienced with it than C# and it was originally written for one of my paid plugins (Contracts), which has 10k+ lines of code and 50+ partial classes declarations.
 
 By default, the build will skip merging partial classes, but if you want to enable it, just follow these steps:
 
