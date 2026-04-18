@@ -4,7 +4,7 @@ namespace MyCarbonoxidePlugin.Plugin;
 
 public partial class MyCarbonoxide
 {
-    [ConsoleCommand("carbonoxide.reset_all_preferences")]
+    [ConsoleCommand("mycarbonoxide.reset_all_preferences")]
     private void CCmdResetAllPreferences(ConsoleSystem.Arg arg)
     {
         if (!IsAdmin(arg))
