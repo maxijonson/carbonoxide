@@ -8,7 +8,6 @@
             Include="$(RustServerManagedPath)/*.dll"
             Exclude="
                 $(RustServerManagedPath)/Newtonsoft.Json.dll;
-                $(RustServerManagedPath)/System.Net.Http.dll;
                 $(RustServerManagedPath)/Microsoft.Win32.Registry.dll;
                 $(RustServerManagedPath)/System.Threading.Tasks.Extensions.dll;
                 $(RustServerManagedPath)/System.Configuration.Install.dll;
