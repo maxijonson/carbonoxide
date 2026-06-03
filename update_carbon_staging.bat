@@ -1,2 +1,2 @@
 @echo off
-_update_carbon.bat edge staging Debug carbon-staging
+_update_carbon.bat rustbeta_staging staging Debug carbon-staging
