@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolvePremiumDirectives } from "./strip-directives";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -200,7 +201,7 @@ const parseBlocks = (lines: string[], expectedIndent: string): Block[] => {
 
         // Handle inline body like "public static partial class Components { }"
         if (parsed.inlineBody) {
-          // Empty or inline body — no children to parse
+          // Empty or inline body, no children to parse
           // Recursively parse body for nested type blocks
           const nestedIndent = expectedIndent + "    ";
           block.children = parseBlocks([], nestedIndent);
@@ -250,7 +251,7 @@ const parseBlocks = (lines: string[], expectedIndent: string): Block[] => {
       }
     }
 
-    // Not a type declaration — if we collected attribute-like lines but they
+    // Not a type declaration. If we collected attribute-like lines but they
     // aren't followed by a type decl, they're loose code
     if (attrLines.length > 0) {
       for (let k = i; k < Math.min(j, lines.length); k++) {
@@ -321,7 +322,7 @@ const mergePartials = (blocks: Block[]): Block[] => {
     });
   }
 
-  // Build output: first occurrence → merged, subsequent → skip
+  // Build output: first occurrence gets merged, later ones are skipped
   const seen = new Set<string>();
   const result: Block[] = [];
 
@@ -469,12 +470,20 @@ const processFile = (lines: string[]): string[] => {
 };
 
 const main = () => {
-  const filePath = process.argv[2] ? resolve(process.argv[2]) : resolve(__dirname, "..", "MyCarbonoxide.cs");
+  const args = process.argv.slice(2);
+  const edition = args.find((arg) => arg.startsWith("--edition="))?.slice("--edition=".length);
+  if (edition !== undefined && edition !== "full" && edition !== "lite") {
+    throw new Error(`Unknown edition: ${edition}`);
+  }
+  const fileArg = args.find((arg) => !arg.startsWith("--"));
+  const filePath = fileArg ? resolve(fileArg) : resolve(__dirname, "..", "MyCarbonoxide.cs");
 
   const content = readFileSync(filePath, "utf-8");
   const lines = content.split(/\r?\n/);
 
-  const outputLines = processFile(lines);
+  const resolvedLines = edition ? resolvePremiumDirectives(lines, edition === "full") : lines;
+  // Oxide and Carbon compile plugins with nullable off, which warns on every `?`
+  const outputLines = ["#nullable enable", "", ...processFile(resolvedLines)];
 
   // Determine line ending from original file
   const lineEnding = content.includes("\r\n") ? "\r\n" : "\n";
@@ -483,8 +492,9 @@ const main = () => {
   // Report
   const partialsBefore = lines.filter((l) => /\bpartial\s+class\b/.test(l)).length;
   const partialsAfter = outputLines.filter((l) => /\bpartial\s+class\b/.test(l)).length;
+  const premium = edition ? ` (${edition}, ${lines.length - resolvedLines.length} PREMIUM lines removed)` : "";
   console.log(
-    `post-merge: ${partialsBefore} partial class declarations → ${partialsBefore - partialsAfter} merged (${partialsAfter} remaining)`,
+    `post-merge${premium}: ${partialsBefore} partial class declarations, ${partialsBefore - partialsAfter} merged (${partialsAfter} remaining)`,
   );
 };
 

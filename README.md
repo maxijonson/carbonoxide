@@ -7,6 +7,7 @@ Carbonoxide was used to build [Contracts](https://www.rustcontracts.com/): a tim
 ## Features
 
 - **📂 Multi-file structure:** Thanks to [MJSU's Plugin.Merge](https://github.com/dassjosh/Plugin.Merge) tool, you can write your code in multiple files and have them automatically merged into a single plugin file.
+- **💰 Lite edition (optional):** Wrap paid-only code in `#if PREMIUM` and every build also gives you a free Lite version of your plugin from the same code.
 - **🔄 Dual framework support:** Easily switch between Oxide and Carbon without modifying your project configuration.
 - **🚀 Production and staging support:** Build for production and staging at the same time with local test servers
 - **📡 Game servers included:** One-click scripts to update and run game servers for all frameworks and branches (production and staging included). They are setup so that they can run all at the same time!
@@ -16,7 +17,7 @@ Carbonoxide was used to build [Contracts](https://www.rustcontracts.com/): a tim
 
 - [dotnet](https://dotnet.microsoft.com/en-us/download/dotnet) SDK - for building the plugin and running the build scripts
 - Windows - for running the Rust server and scripts
-- (Optional) NodeJS - for [merging partial classes](#optional-merging-partial-classes) outputed by Plugin.Merge
+- (Optional) NodeJS - for [merging partial classes](#optional-merging-partial-classes) outputed by Plugin.Merge. Required for the [Lite edition](#optional-lite-edition).
 
 ## Getting Started
 
@@ -27,7 +28,7 @@ Carbonoxide was used to build [Contracts](https://www.rustcontracts.com/): a tim
    1. `MyCarbonoxide` (CASE SENSITIVE!) - Replace with the the name of your plugin, no spaces (e.g., `GatherManager`). Check for files that have `MyCarbonoxide` in their name as well!
    2. `mycarbonoxide` (CASE SENSITIVE!) - Replace with the lowercase name of your plugin, no spaces (e.g., `gathermanager`). This is used for things like config file names and permission strings.
 3. Run all the `update_*.bat` scripts (not `_update*.bat` files!) to create/update the local game servers. They will be created in the `servers` folder.
-4. Run all the `run_*.bat` scripts at least once to generate the framework folders and initialize their worlds. (do this every update for Carbon servers, so you get the latest developer assemblies)
+4. Run all the `run_*.bat` scripts at least once to generate the framework folders and initialize their worlds. On Oxide servers, this also writes the publicized game assemblies to `servers/oxide-*/publicized`, which the build needs. (do this after every update, so the build gets the latest developer assemblies for Carbon and publicized assemblies for Oxide)
 5. In Carbon servers `config.json` (`servers/carbon-*/carbon/config.json`), set `DeveloperMode` to `true` so that developer assemblies will be generated on the first run.
 6. If you want to start fresh without the opinionated structure I've included, you can delete all the included files in the `src` folder except for `MyCarbonoxide.cs`. The included files are just a suggestion to demonstrate the multi-file structure and how to use partial classes.
 
@@ -60,10 +61,10 @@ dotnet build carbon-staging.csproj
 To verify the plugin compiles against all 4 environments at once (compile-only, no merge/format/copy):
 
 ```bash
-dotnet msbuild plugin.csproj -t:ValidateAll
+dotnet msbuild plugin.csproj -restore -t:ValidateAll
 ```
 
-This runs the normal build first, then compiles against each environment's assemblies.
+This runs the normal build first, then compiles `src` against each environment you have a server for, and compiles the merged `MyCarbonoxide.cs` the same way a server would. With the [Lite edition](#optional-lite-edition) on, it also compiles `src` without `PREMIUM` and compiles `lite/MyCarbonoxide.cs`.
 
 ## VS Code Setup
 
@@ -82,6 +83,79 @@ By default, the build will skip merging partial classes, but if you want to enab
    > I personally use [Volta](https://volta.sh/), because it automatically manages NodeJS versions for all my other TypeScript repos, but you can also install it [globally](https://nodejs.org/) or use something like [nvm](https://github.com/nvm-sh/nvm)
 2. Install the dependencies by running `npm install` in the project directory.
 3. The build process will automatically start using the `post-merge.ts` script in the build process when it detects NodeJS and the presence of the `node_modules` folder.
+
+## (Optional) Lite edition
+
+> This feature is almost exactly how I ship Contracts' Premium and Lite editions!
+
+If you sell your plugin, you might want to put a free Lite version out there too, with only some of the features. Instead of keeping two copies of your code, you wrap the paid-only parts in `#if PREMIUM` and every build makes both files from the same `src`:
+
+- `MyCarbonoxide.cs`: the full plugin.
+- `lite/MyCarbonoxide.cs`: the Lite plugin, with everything inside `#if PREMIUM` removed.
+
+Both files have the same class name, `[Info]`, config and data paths. Server owners can upgrade by swapping the file and their config and data keep working.
+
+To turn it on:
+
+1. Set `LiteEdition` to `true` in `Directory.Build.props`.
+2. Set up NodeJS like in [merging partial classes](#optional-merging-partial-classes). Here it's not optional. The server never defines `PREMIUM`, so without the post-merge script your `#if PREMIUM` code would be missing from the full plugin too. The build stops if it can't find NodeJS.
+3. Wrap your paid-only code:
+
+```cs
+public partial class MyCarbonoxide
+{
+#if PREMIUM
+    private void OpenLeaderboard(BasePlayer player)
+    {
+        // ...
+    }
+#endif
+
+    private int GetMaxHomes(BasePlayer player)
+    {
+#if PREMIUM
+        return Settings.MaxHomes;
+#else
+        return 1;
+#endif
+    }
+}
+```
+
+`#if !PREMIUM` works too, for code that should only be in the Lite version.
+
+A few rules:
+
+- Only `#if PREMIUM`, `#if !PREMIUM`, `#else` and `#endif` are supported. No `#elif`, and no combining like `#if PREMIUM && CARBON` (put one `#if` inside the other instead). The build stops with an error if it finds one.
+- The `#if` has to be inside a class body. It doesn't work outside of it, because Plugin.Merge resolves `#if` blocks around a whole file, a whole class or `using` lines on its own, before the Lite step runs. `PREMIUM` isn't defined at that point, so that code gets dropped from both files. To make a whole file premium, wrap what's inside the class instead:
+
+```cs
+
+// ❌ BAD
+
+#if PREMIUM
+public partial class MyCarbonoxide
+{
+    // the whole file goes here
+}
+#endif
+
+// ✅ GOOD
+
+public partial class MyCarbonoxide
+{
+#if PREMIUM
+    // the whole file goes here
+#endif
+}
+```
+
+- Wrapping a method call doesn't wrap the method itself. Lite still compiles, but the method's code ships in the Lite file. Before a release, search `lite/MyCarbonoxide.cs` for your paid features to make sure they're gone.
+  - In Contracts, I usually keep the last shipped version of Lite. Before I upload a new Lite version, I compare it with the current Lite build to ensure that no paid features have accidentally been included. (using VS Code's file comparison feature)
+- **This is more of a strong recommendation but not mandatory**: Leave full config and data classes in both versions, so a full config still loads on Lite. Only wrap the code that does things/logic: hooks, commands, UI.
+  - Here's how I reason about it when developing Contracts: only wrap your "secret sauce", the algorithms and logic by premium directives (anything that makes your paid features come alive). Don't wrap stuff that just "defines" a premium feature: Data structures, config, and other non-logic code should remain outside of `#if PREMIUM` blocks. This makes your code much easier to maintain without accidentally breaking the Lite version. It also makes a much nicer upgrade experience for server owners: all they need to do is swap the plugin file. No new data files or config options suddenly appear.
+
+Each build copies the full plugin to your local servers. Run `copy_lite.bat` to test the Lite one instead (the next build puts the full one back). [`ValidateAll`](#validating-all-environments) also checks that the Lite version compiles.
 
 ## Plugin Dependencies
 

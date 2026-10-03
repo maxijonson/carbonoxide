@@ -24,7 +24,7 @@
       "Indent Multiplier": 1,
       "New Line String": "\r\n",
       "Write The Relative File Path In Region": false,
-      "Keep Code Comments": true
+      "Keep Code Comments": false
     }
   },
   "Preprocessor Directive Settings": {
@@ -32,13 +32,17 @@
   },
   "Compile Settings": {
     "Assembly Paths": [
+      "./servers/oxide-production/publicized",
       "./servers/oxide-production/RustDedicated_Data/Managed"
     ],
     "Ignore Paths": [
       "./servers/oxide-production/RustDedicated_Data/Managed/x86",
       "./servers/oxide-production/RustDedicated_Data/Managed/x64"
     ],
-    "Ignore Files": [],
+    "Ignore Files": [
+      "./servers/oxide-production/RustDedicated_Data/Managed/Newtonsoft.Json.dll",
+      "./servers/oxide-production/RustDedicated_Data/Managed/Assembly-CSharp.dll"
+    ],
     "Compile Log Level (Hidden, Info, Warning, Error)": "Error"
   }
 }

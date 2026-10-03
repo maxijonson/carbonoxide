@@ -1,10 +1,7 @@
 <Project>
     <ItemGroup>
-        <Compile Remove="MyCarbonoxide.cs" />
-        <Compile Remove="servers/*/oxide/plugins/**/*.cs" />
-        <Compile Remove="servers/*/carbon/plugins/**/*.cs" />
-        <Compile Remove="backup/*.cs" />
-        <Compile Remove="dependencies/**/*.cs" />
+        <Compile Include="src/**/*.cs" Condition="'$(ValidateMerged)' == ''" />
+        <Compile Include="$(ValidateMerged)" Condition="'$(ValidateMerged)' != ''" />
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SkipPostBuild)' != 'true'">
@@ -21,9 +18,37 @@
         >
             <Output TaskParameter="ExitCode" PropertyName="NpxExitCode" />
         </Exec>
-        <Exec Command="npx tsx scripts/post-merge.ts MyCarbonoxide.cs" Condition="'$(NpxExitCode)' == '0'" />
+        <Exec
+            Command="npx tsx scripts/post-merge.ts MyCarbonoxide.cs"
+            Condition="'$(NpxExitCode)' == '0' And '$(LiteEdition)' != 'true'"
+        />
+
+        <!-- Lite edition -->
+        <Error
+            Condition="'$(LiteEdition)' == 'true' And '$(NpxExitCode)' != '0'"
+            Text="LiteEdition needs NodeJS to build. Install NodeJS and run `npm install`."
+        />
+        <Copy
+            SourceFiles="MyCarbonoxide.cs"
+            DestinationFiles="lite/MyCarbonoxide.cs"
+            Condition="'$(LiteEdition)' == 'true'"
+        />
+        <Exec
+            Command="npx tsx scripts/post-merge.ts MyCarbonoxide.cs --edition=full"
+            Condition="'$(LiteEdition)' == 'true'"
+        />
+        <Exec
+            Command="npx tsx scripts/post-merge.ts lite/MyCarbonoxide.cs --edition=lite"
+            Condition="'$(LiteEdition)' == 'true'"
+        />
 
         <!-- Formats the file for consistent outputs and avoid things like spaces and line breaks to appear as diffs -->
         <Exec Command="dotnet tool run csharpier -- format ." />
+        <!-- `format .` skips gitignored files, so the merged files are formatted explicitly in case they're ignored -->
+        <Exec Command="dotnet tool run csharpier -- format MyCarbonoxide.cs --ignore-path .csharpierignore" />
+        <Exec
+            Command="dotnet tool run csharpier -- format lite/MyCarbonoxide.cs --ignore-path .csharpierignore"
+            Condition="'$(LiteEdition)' == 'true'"
+        />
     </Target>
 </Project>

@@ -25,9 +25,40 @@
     </Target>
 
     <Target Name="ValidateAll" DependsOnTargets="Build">
-        <MSBuild Projects="oxide-production.csproj" Targets="Restore;Build" Properties="SkipPostBuild=true" />
-        <MSBuild Projects="oxide-staging.csproj" Targets="Restore;Build" Properties="SkipPostBuild=true" />
-        <MSBuild Projects="carbon-production.csproj" Targets="Restore;Build" Properties="SkipPostBuild=true" />
-        <MSBuild Projects="carbon-staging.csproj" Targets="Restore;Build" Properties="SkipPostBuild=true" />
+        <ItemGroup>
+            <ValidateProject Include="oxide-production.csproj" Condition="Exists('servers/oxide-production')" />
+            <ValidateProject Include="oxide-staging.csproj" Condition="Exists('servers/oxide-staging')" />
+            <ValidateProject Include="carbon-production.csproj" Condition="Exists('servers/carbon-production')" />
+            <ValidateProject Include="carbon-staging.csproj" Condition="Exists('servers/carbon-staging')" />
+        </ItemGroup>
+
+        <!-- Restore needs its own call, a Build in the same call doesn't see what the restore just wrote -->
+        <MSBuild
+            Projects="@(ValidateProject)"
+            Targets="Restore"
+            Properties="MSBuildRestoreSessionId=$([System.Guid]::NewGuid())"
+        />
+        <MSBuild Projects="@(ValidateProject)" Targets="Build" Properties="SkipPostBuild=true" />
+
+        <!-- src compiles without PREMIUM defined -->
+        <MSBuild
+            Projects="oxide-production.csproj"
+            Targets="Build"
+            Properties="SkipPostBuild=true;Edition=Lite"
+            Condition="'$(LiteEdition)' == 'true'"
+        />
+
+        <!-- The merged files compile the way a server sees them -->
+        <MSBuild
+            Projects="oxide-production.csproj"
+            Targets="Build"
+            Properties="SkipPostBuild=true;ValidateMerged=MyCarbonoxide.cs"
+        />
+        <MSBuild
+            Projects="oxide-production.csproj"
+            Targets="Build"
+            Properties="SkipPostBuild=true;ValidateMerged=lite/MyCarbonoxide.cs"
+            Condition="'$(LiteEdition)' == 'true'"
+        />
     </Target>
 </Project>

@@ -92,7 +92,7 @@
             "label": "Validate All Environments",
             "type": "process",
             "command": "dotnet",
-            "args": ["msbuild", "plugin.csproj", "-t:ValidateAll"],
+            "args": ["msbuild", "plugin.csproj", "-restore", "-t:ValidateAll"],
             "group": "build",
             "problemMatcher": "$msCompile"
         }
