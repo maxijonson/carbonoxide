@@ -1,2 +1,2 @@
 @echo off
-_update_oxide.bat production public oxide-production
+_update_oxide.bat release public oxide-production

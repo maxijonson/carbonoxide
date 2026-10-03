@@ -40,12 +40,18 @@ if not exist "%steam%" (
 @REM Download the server
 cd "%steam%"
 echo Downloading Rust server on %BRANCH% branch...
+@REM Forget the installed build so steam checks every file against the new one
+if exist "%server%\steamapps\appmanifest_258550.acf" del "%server%\steamapps\appmanifest_258550.acf"
 steamcmd.exe +force_install_dir "%server%" ^
 			 +login anonymous ^
              +app_update 258550 ^
 			 -beta %BRANCH% ^
              validate ^
-             +quit ^
+             +quit
+if errorlevel 1 (
+	echo Steam update failed, Carbon was not installed
+	exit /b 1
+)
 
 @REM Download latest Carbon build
 echo Downloading Carbon
