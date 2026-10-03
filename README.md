@@ -1,6 +1,8 @@
 # Carbonoxide
 
-A template for building Rust game plugins for both Oxide and Carbon frameworks.
+A template for building Rust game plugins for both Oxide and Carbon frameworks with multi-file structure support so you don't have to write it all in one large file. 
+
+Carbonoxide was used to build [Contracts](https://www.rustcontracts.com/): a time-rotating quest system.
 
 ## Features
 
