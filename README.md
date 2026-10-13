@@ -64,7 +64,7 @@ To verify the plugin compiles against all 4 environments at once (compile-only, 
 dotnet msbuild plugin.csproj -restore -t:ValidateAll
 ```
 
-This runs the normal build first, then compiles `src` against each environment you have a server for, and compiles the merged `MyCarbonoxide.cs` the same way a server would. With the [Lite edition](#optional-lite-edition) on, it also compiles `src` without `PREMIUM` and compiles `lite/MyCarbonoxide.cs`.
+This runs the normal build first, then compiles `src` against each environment you have a server for, and compiles the merged `MyCarbonoxide.cs` the same way both an Oxide and a Carbon server would. With the [Lite edition](#optional-lite-edition) on, it also compiles `src` without `PREMIUM` and compiles `lite/MyCarbonoxide.cs`.
 
 ## VS Code Setup
 
