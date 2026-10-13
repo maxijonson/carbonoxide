@@ -13,7 +13,7 @@ SET root=%cd%
 SET server=%root%\servers\%~4
 SET steam=%root%\steam
 SET steamCmd=https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip
-SET carbonUrl=https://github.com/CarbonCommunity/Carbon.Core/releases/download/%TAG%_build/Carbon.Windows.%BUILD%.zip
+SET carbonUrl=https://github.com/CarbonCommunity/Carbon/releases/download/%TAG%_build/Carbon.Windows.%BUILD%.zip
 
 echo Server directory: %server%
 echo Steam directory: %steam%
