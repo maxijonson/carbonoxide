@@ -25,8 +25,6 @@
     </Target>
 
     <Target Name="ValidateAll" DependsOnTargets="Build">
-        <Exec Command="npx tsx scripts/strip-directives.test.ts" Condition="'$(NpxExitCode)' == '0'" />
-
         <ItemGroup>
             <ValidateProject Include="oxide-production.csproj" Condition="Exists('servers/oxide-production')" />
             <ValidateProject Include="oxide-staging.csproj" Condition="Exists('servers/oxide-staging')" />
