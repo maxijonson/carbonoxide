@@ -14,9 +14,17 @@ if "%worldsize%" EQU "" SET worldsize=1000
 SET seed=%~6
 if "%seed%" EQU "" SET seed=131302294
 
-rem oxide writes the publicized game assemblies here on boot, the csprojs build against them
+rem oxide writes the publicized game assemblies here when it compiles a plugin, the csprojs build against them
 if not exist "%server%\publicized" mkdir "%server%\publicized"
 SET OXIDE_PublicizerOutput=%server%\publicized
+
+rem a fresh oxide server has no plugin to compile yet, so it gets a placeholder until the assemblies exist
+SET placeholder=%server%\oxide\plugins\CarbonoxidePublicize.cs
+SET needsPlaceholder=
+if exist "%server%\RustDedicated_Data\Managed\Oxide.Core.dll" if not exist "%server%\publicized\Assembly-CSharp.dll" SET needsPlaceholder=1
+if defined needsPlaceholder if not exist "%server%\oxide\plugins" mkdir "%server%\oxide\plugins"
+if defined needsPlaceholder echo namespace Oxide.Plugins { [Info("CarbonoxidePublicize", "Carbonoxide", "1.0.0")] public class CarbonoxidePublicize : RustPlugin { } }>"%placeholder%"
+if not defined needsPlaceholder if exist "%placeholder%" del "%placeholder%"
 
 echo Starting server in %server%...
 cd "%server%"

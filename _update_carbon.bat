@@ -39,6 +39,8 @@ if not exist "%steam%" (
 
 @REM Download the server
 cd "%steam%"
+@REM steamcmd can exit non-zero after updating itself, so let it do that before the run whose exit code is checked
+steamcmd.exe +quit
 echo Downloading Rust server on %BRANCH% branch...
 @REM Forget the installed build so steam checks every file against the new one
 if exist "%server%\steamapps\appmanifest_258550.acf" del "%server%\steamapps\appmanifest_258550.acf"
